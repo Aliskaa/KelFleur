@@ -1,12 +1,14 @@
 package com.project.kelfleur;
 
 import android.app.Activity;
+import android.app.MediaRouteButton;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,6 +42,8 @@ public class TakePhoto extends Activity{
     private static final String JPEG_FILE_SUFFIX = ".jpg";
 
     private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
+    private Button btn_take_picture;
+    private Button btn_OK;
 
     /* Photo album for this application */
     private String getAlbumName() {
@@ -116,10 +120,17 @@ public class TakePhoto extends Activity{
 
 		/* Decode the JPEG file into a Bitmap */
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        Matrix matrix = new Matrix();
+        matrix.setRotate(90);
+
+        Bitmap bitmapRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+        bitmap = bitmapRotated;
 
 		/* Associate the Bitmap to the ImageView */
         mImageView.setImageBitmap(bitmap);
         mImageView.setVisibility(View.VISIBLE);
+        btn_OK.setVisibility(View.VISIBLE);
     }
 
     private void galleryAddPic() {
@@ -182,26 +193,24 @@ public class TakePhoto extends Activity{
         mImageView = (ImageView) findViewById(R.id.imageView1);
         mImageBitmap = null;
 
-        Button picBtn = (Button) findViewById(R.id.btn_take_picture);
+        btn_take_picture = (Button) findViewById(R.id.btn_take_picture);
         setBtnListenerOrDisable(
-                picBtn,
+                btn_take_picture,
                 mTakePicOnClickListener,
                 MediaStore.ACTION_IMAGE_CAPTURE
         );
+
+        btn_OK = (Button) findViewById(R.id.btn_OK);
+        btn_OK.setVisibility(View.INVISIBLE);
 
         mAlbumStorageDirFactory = new BaseAlbumDirFactory();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case ACTION_TAKE_PHOTO_B: {
-                if (resultCode == RESULT_OK) {
-                    handleBigCameraPhoto();
-                }
-                break;
-            } // ACTION_TAKE_PHOTO_B
-        } // switch
+        if (resultCode == RESULT_OK) {
+            handleBigCameraPhoto();
+        }
     }
 
     // Some lifecycle callbacks so that the image can survive orientation change
@@ -221,6 +230,7 @@ public class TakePhoto extends Activity{
                 savedInstanceState.getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ?
                         ImageView.VISIBLE : ImageView.INVISIBLE
         );
+
     }
 
     /**
