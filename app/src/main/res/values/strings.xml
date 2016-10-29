@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">KelFleur</string>
+    <string name="album_name">CameraSample</string>
+
+    <!-- Boutons -->
+    <string name="btn_photo">Prendre photo</string>
+    <string name="btn_pokefleur">Poke Fleur</string>
+    <string name="btn_take_photo"> Prendre Photo </string>
+
+
+    <!-- Errors -->
+    <string name="cannot">Cannot</string>
 </resources>
